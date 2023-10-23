@@ -33,4 +33,4 @@
   dotnet run --environment "Development"
   ```
 
-  - <http://localhost:5100/swagger>
+  - <http://localhost:000/swagger>
