@@ -30,7 +30,7 @@
 - executar projeto
 
   ```bash
-  dotnet run
+  dotnet run --environment "Development"
   ```
 
   - <http://localhost:5100/swagger>
