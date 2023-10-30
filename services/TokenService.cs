@@ -22,7 +22,7 @@ public class TokenService
         new("externalId", user.ExternalId)
     };
 
-    var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SymmetricSecurityKey"] ?? ""));
+    var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SymmetricSecurityKey"] ?? "0xa3fa6d97AaAz7e145b37451fc344e58c"));
 
     var signingCredentials = new SigningCredentials(chave, SecurityAlgorithms.HmacSha256);
 
