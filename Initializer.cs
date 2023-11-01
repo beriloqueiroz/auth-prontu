@@ -14,9 +14,11 @@ public static class Initializer
   {
     services.AddDbContext<UserDbContext>(options => options.UseNpgsql(Configuration["ConnectionStrings:UserConnection"]));
 
-    services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)//todo mudar para true
+    services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<UserDbContext>()
     .AddDefaultTokenProviders();
+
+    services.AddRazorPages();
 
     services.AddAuthentication(options =>
     {
@@ -36,6 +38,8 @@ public static class Initializer
     services.AddScoped<UserService>();
     services.AddScoped<TokenService>();
     services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+    services.AddTransient<IEmailSender, EmailSender>();
 
     var db = services.BuildServiceProvider().GetRequiredService<UserDbContext>();
     db.Database.CanConnectAsync().ContinueWith(_ => db.Database.Migrate());

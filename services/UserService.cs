@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Identity;
 
 namespace identity.user;
@@ -7,13 +8,18 @@ public class UserService
   private readonly UserManager<User> UserManager;
   private readonly SignInManager<User> SignInManager;
 
+  private readonly IEmailSender EmailSender;
+
   private readonly TokenService TokenService;
 
-  public UserService(UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService)
+  private readonly string UrlEmailConfirmation = "http://localhost:5000/User/confirm";
+
+  public UserService(UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, IEmailSender emailSender)
   {
     UserManager = userManager;
     SignInManager = signInManager;
     TokenService = tokenService;
+    EmailSender = emailSender;
   }
 
   public async Task Register(User user, string password)
@@ -27,11 +33,21 @@ public class UserService
 
     string token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
 
-    //TODO send email confirmation
+    if (user.Email == null || user.Id == null)
+    {
+      throw new ApplicationException("Erro ao enviar email, email nulo!");
+
+    }
+    await EmailSender.SendEmailAsync(user.Email, "Prontu - Email de confirmação", $"Confirme seu email no link {UrlEmailConfirmation}?token={WebUtility.UrlEncode(token)}&id={WebUtility.UrlEncode(user.Id)}");
   }
 
-  public async Task Confirm(User user, string token)
+  public async Task Confirm(string id, string token)
   {
+    User? user = await UserManager.FindByIdAsync(id);
+    if (user == null)
+    {
+      throw new ApplicationException("Erro ao encontrar usuário!");
+    }
     var userResult = await UserManager.ConfirmEmailAsync(user, token);
 
     if (!userResult.Succeeded)

@@ -53,6 +53,13 @@ public class UserController : ControllerBase
     return Ok("Acesso permitido!");
   }
 
+  [HttpGet("confirm")]
+  public async Task<IActionResult> EmailConfirmationAsync(string id, string token)
+  {
+    await UserService.Confirm(id, token);
+    return Ok("Usuário confirmado!");
+  }
+
   [HttpDelete("logout")]
   [Authorize]
   public async Task<IActionResult> Logout()
