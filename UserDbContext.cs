@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class UserDbContext : IdentityDbContext<User>
 {
+  public DbSet<AuthToken>? AuthTokens { get; set; }
   public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
   {
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);//para solucionar datetime error Pgsql

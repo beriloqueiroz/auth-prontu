@@ -15,7 +15,17 @@ public class RegisterUserControllerDto
   public required string RePassword { get; set; }
 
   [Required]
-  public required string ExternalId { get; set; }
+  public required string Username { get; set; }
+}
+
+public class ChangePasswordControllerDto
+{
+  [Required]
+  [DataType(DataType.Password)]
+  public required string OldPassword { get; set; }
+  [Required]
+  [DataType(DataType.Password)]
+  public required string NewPassword { get; set; }
 }
 
 public record LoginUserControllerDto

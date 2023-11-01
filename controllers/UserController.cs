@@ -9,8 +9,10 @@ public class UserController : ControllerBase
 {
 
   private readonly UserService UserService;
-  public UserController(UserService userService)
+  private readonly IAuthorizationService AuthorizationService;
+  public UserController(UserService userService, IAuthorizationService authorizationService)
   {
+    AuthorizationService = authorizationService;
     UserService = userService;
   }
 
@@ -19,8 +21,7 @@ public class UserController : ControllerBase
   {
     User user = new()
     {
-      ExternalId = input.ExternalId,
-      UserName = input.ExternalId,
+      UserName = input.Username,
       Email = input.Email
     };
 
@@ -50,6 +51,37 @@ public class UserController : ControllerBase
   public IActionResult IsAuthorized()
   {
     return Ok("Acesso permitido!");
+  }
+
+  [HttpDelete("logout")]
+  [Authorize]
+  public async Task<IActionResult> Logout()
+  {
+    var authTokenClaim = User.FindFirst(claim => claim.Type == "authToken")?.Value;
+    if (authTokenClaim == null)
+    {
+      return Ok();
+    }
+    await UserService.Logout(new[] { authTokenClaim });
+    return Ok();
+  }
+
+  [HttpPut("change-password")]
+  [Authorize]
+  public async Task<IActionResult> ChangePassword(ChangePasswordControllerDto input)
+  {
+    var id = User.FindFirst(claim => claim.Type == "id")?.Value;
+    if (id == null)
+    {
+      return NotFound();
+    }
+    var username = User.FindFirst(claim => claim.Type == "username")?.Value;
+    if (username == null)
+    {
+      return NotFound();
+    }
+    await UserService.ChangePassword(id, input.NewPassword, input.OldPassword);
+    return Ok();
   }
 
 }

@@ -8,7 +8,7 @@ using identity.user;
 
 #nullable disable
 
-namespace identity_prontu.Migrations
+namespace auth_prontu.Migrations
 {
     [DbContext(typeof(UserDbContext))]
     partial class UserDbContextModelSnapshot : ModelSnapshot
@@ -21,6 +21,21 @@ namespace identity_prontu.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AuthTokenUser", b =>
+                {
+                    b.Property<Guid>("AuthTokensId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("text");
+
+                    b.HasKey("AuthTokensId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("AuthTokenUser");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -154,6 +169,27 @@ namespace identity_prontu.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("identity.user.AuthToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("Expiration")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuthTokens");
+                });
+
             modelBuilder.Entity("identity.user.User", b =>
                 {
                     b.Property<string>("Id")
@@ -172,10 +208,6 @@ namespace identity_prontu.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("ExternalId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -212,8 +244,6 @@ namespace identity_prontu.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExternalId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -222,6 +252,21 @@ namespace identity_prontu.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AuthTokenUser", b =>
+                {
+                    b.HasOne("identity.user.AuthToken", null)
+                        .WithMany()
+                        .HasForeignKey("AuthTokensId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("identity.user.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

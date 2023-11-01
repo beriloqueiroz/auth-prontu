@@ -65,21 +65,36 @@ public class UserService
 
     if (user == null)
     {
-      throw new ApplicationException("Erro ao entrar!");
+      throw new ApplicationException("Erro ao validar/autenticar!");
     }
 
     var userResult = await SignInManager.PasswordSignInAsync(user, password, false, false);
 
     if (!userResult.Succeeded)
     {
-      throw new ApplicationException("Erro ao entrar!");
+      throw new ApplicationException("Erro ao validar/autenticar!");
     }
 
     return TokenService.Generate(user);
   }
 
-  public async void Logout()
+  public Task Logout(string[] authTokens)
   {
-    await SignInManager.SignOutAsync();
+    TokenService.RemoveAuthTokens(authTokens);
+    return Task.CompletedTask;
   }
+
+  public async Task ChangePassword(string id, string newPassword, string currentPassword)
+  {
+    User? user = await UserManager.FindByIdAsync(id);
+    if (user == null)
+    {
+      throw new ApplicationException("Erro ao encontrar usuário!");
+    }
+    await UserManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+    string[] authTokens = user.AuthTokens.Select(at => at.Value).ToArray();
+    TokenService.RemoveAuthTokens(authTokens);
+  }
+
 }
