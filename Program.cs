@@ -11,9 +11,14 @@ builder.Services.InjectMySwagger();
 
 var app = builder.Build();
 
+Console.WriteLine("Setting environment variables for each target..., how production\n ");
+Environment.SetEnvironmentVariable("UrlBase", "https://localhost:5100");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseMyDocumentation();
+    Console.WriteLine("Setting environment variables for each target..., how development\n ");
+    Environment.SetEnvironmentVariable("UrlBase", "http://localhost:5100");
 }
 
 app.UseHttpsRedirection();
