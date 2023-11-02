@@ -12,7 +12,7 @@ public class UserService
 
   private readonly TokenService TokenService;
 
-  private readonly string UrlEmailConfirmation = "http://localhost:5000/User/confirm";
+  private readonly string UrlEmailConfirmation = Environment.GetEnvironmentVariable("UrlBase") + "/User/confirm";
 
   public UserService(UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, IEmailSender emailSender)
   {

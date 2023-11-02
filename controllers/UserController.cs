@@ -10,6 +10,11 @@ public class UserController : ControllerBase
 
   private readonly UserService UserService;
   private readonly IAuthorizationService AuthorizationService;
+
+  public IAuthorizationService authorizationService()
+  {
+    return AuthorizationService;
+  }
   public UserController(UserService userService, IAuthorizationService authorizationService)
   {
     AuthorizationService = authorizationService;

@@ -29,7 +29,7 @@ public class AuthorizationService : IAuthorizationService
       return Task.FromResult(AuthorizationResult.Failed());
     }
 
-    if (authToken.Users.Any(us => us.Id == idClaim))
+    if (authToken.Users.Exists(us => us.Id == idClaim))
     {
       return Task.FromResult(AuthorizationResult.Success());
     }
