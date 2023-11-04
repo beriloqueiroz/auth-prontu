@@ -26,7 +26,7 @@ public class TokenService
     {
       Id = authId,
       CreatedAt = DateTime.Now,
-      Expiration = expires.Millisecond,
+      Expiration = expires.Ticks,
       Value = value
     };
 
@@ -38,7 +38,8 @@ public class TokenService
     {
         new("username", user.UserName ?? ""),
         new("id", user.Id),
-        new("authToken", value)
+        new("authToken", value),
+        new("email", user.Email ?? "")
     };
 
     var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SymmetricSecurityKey"] ?? "0xa3fa6d97AaAz7e145b37451fc344e58c"));
