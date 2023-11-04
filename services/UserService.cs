@@ -13,6 +13,7 @@ public class UserService
   private readonly TokenService TokenService;
 
   private readonly string UrlEmailConfirmation = Environment.GetEnvironmentVariable("UrlBase") + "/User/confirm";
+  private readonly string UrlEmailChangeConfirmation = Environment.GetEnvironmentVariable("UrlBase") + "/User/change-confirm";
 
   public UserService(UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, IEmailSender emailSender)
   {
@@ -111,6 +112,39 @@ public class UserService
 
     string[] authTokens = user.AuthTokens.Select(at => at.Value).ToArray();
     TokenService.RemoveAuthTokens(authTokens);
+  }
+
+  public async Task ChangeEmail(string userId, string email)
+  {
+    User? user = await UserManager.FindByIdAsync(userId);
+    if (user == null)
+    {
+      throw new ApplicationException("Erro ao encontrar usuário!");
+    }
+    user.Email = email;
+    string token = await UserManager.GenerateChangeEmailTokenAsync(user, email);
+
+    if (user.Email == null || user.Id == null)
+    {
+      throw new ApplicationException("Erro ao enviar email, email nulo!");
+    }
+    await EmailSender.SendEmailAsync(user.Email, "Prontu - Email de confirmação", $"Confirme seu email no link {UrlEmailChangeConfirmation}?token={WebUtility.UrlEncode(token)}&id={WebUtility.UrlEncode(user.Id)}&email={email}");
+  }
+
+
+  public async Task ChangeEmailConfirm(string id, string token, string email)
+  {
+    User? user = await UserManager.FindByIdAsync(id);
+    if (user == null)
+    {
+      throw new ApplicationException("Erro ao encontrar usuário!");
+    }
+    var userResult = await UserManager.ChangeEmailAsync(user, email, token);
+
+    if (!userResult.Succeeded)
+    {
+      throw new ApplicationException("Erro ao confirmar!");
+    }
   }
 
 }

@@ -61,6 +61,13 @@ public class UserController : ControllerBase
     return Ok("Usuário confirmado!");
   }
 
+  [HttpGet("change-confirm")]
+  public async Task<IActionResult> EmailChangeConfirmationAsync(string id, string token, string email)
+  {
+    await UserService.ChangeEmailConfirm(id, token, email);
+    return Ok("Usuário confirmado!");
+  }
+
   [HttpDelete("logout")]
   [Authorize]
   public async Task<IActionResult> Logout()
@@ -89,6 +96,19 @@ public class UserController : ControllerBase
       return NotFound();
     }
     await UserService.ChangePassword(id, input.NewPassword, input.OldPassword);
+    return Ok();
+  }
+
+  [HttpPut("change-email")]
+  [Authorize]
+  public async Task<IActionResult> ChangeEmail(string email)
+  {
+    var userId = User.FindFirst(claim => claim.Type == "id")?.Value;
+    if (userId == null)
+    {
+      return NotFound();
+    }
+    await UserService.ChangeEmail(userId, email);
     return Ok();
   }
 
