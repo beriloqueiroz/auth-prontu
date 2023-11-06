@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace identity.user;
 
@@ -22,7 +23,14 @@ public class AuthorizationService : IAuthorizationService
       return Task.FromResult(AuthorizationResult.Failed());
     }
 
-    AuthToken? authToken = Context.AuthTokens?.Where(at => at.Value == authTokenClaim).Include(at => at.Users).First();
+    var listOfTokens = Context.AuthTokens?.Where(at => at.Value == authTokenClaim).Include(at => at.Users);
+
+    if (listOfTokens.IsNullOrEmpty())
+    {
+      return Task.FromResult(AuthorizationResult.Failed());
+    }
+
+    AuthToken? authToken = listOfTokens?.First();
 
     if (authToken == null)
     {

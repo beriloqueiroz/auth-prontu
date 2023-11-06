@@ -7,11 +7,8 @@ public class UserService
 {
   private readonly UserManager<User> UserManager;
   private readonly SignInManager<User> SignInManager;
-
   private readonly IEmailSender EmailSender;
-
   private readonly TokenService TokenService;
-
   private readonly string UrlEmailConfirmation = Environment.GetEnvironmentVariable("UrlBase") + "/User/confirm";
   private readonly string UrlEmailChangeConfirmation = Environment.GetEnvironmentVariable("UrlBase") + "/User/change-confirm";
 
@@ -29,7 +26,7 @@ public class UserService
 
     if (!userResult.Succeeded)
     {
-      throw new ApplicationException("Erro ao cadastrar usuário!" + userResult.Errors.Select(err => $"Code: {err.Code}, desctription: {err.Description}"));
+      throw new ApplicationException("Erro ao cadastrar usuário! " + userResult.Errors.Select(err => $"Code: {err.Code}, desctription: {err.Description}"));
     }
 
     string token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -63,7 +60,7 @@ public class UserService
 
     if (!userResult.Succeeded)
     {
-      throw new ApplicationException("Erro ao entrar!");
+      throw new UnauthorizedAccessException("Erro ao entrar!");
     }
 
     User? user = SignInManager.UserManager.Users.FirstOrDefault(u => u.NormalizedUserName == username.ToUpper());
@@ -82,14 +79,14 @@ public class UserService
 
     if (user == null)
     {
-      throw new ApplicationException("Erro ao validar/autenticar!");
+      throw new UnauthorizedAccessException("Erro ao validar/autenticar!");
     }
 
     var userResult = await SignInManager.PasswordSignInAsync(user, password, false, false);
 
     if (!userResult.Succeeded)
     {
-      throw new ApplicationException("Erro ao validar/autenticar!");
+      throw new UnauthorizedAccessException("Erro ao validar/autenticar!");
     }
 
     return TokenService.Generate(user);
@@ -108,7 +105,13 @@ public class UserService
     {
       throw new ApplicationException("Erro ao encontrar usuário!");
     }
-    await UserManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+    var userResult = await UserManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+    if (!userResult.Succeeded)
+    {
+      throw new UnauthorizedAccessException("Erro ao validar senha!");
+    }
 
     string[] authTokens = user.AuthTokens.Select(at => at.Value).ToArray();
     TokenService.RemoveAuthTokens(authTokens);

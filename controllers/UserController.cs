@@ -1,4 +1,6 @@
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace identity.user;
@@ -112,5 +114,46 @@ public class UserController : ControllerBase
     return Ok();
   }
 
-}
+  [Route("/error-development")]
+  [ApiExplorerSettings(IgnoreApi = true)]
+  public IActionResult HandleErrorDevelopment([FromServices] IHostEnvironment hostEnvironment)
+  {
+    if (!hostEnvironment.IsDevelopment())
+    {
+      return NotFound();
+    }
 
+    var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+
+    return FilterException(exceptionHandlerFeature.Error);
+  }
+
+  [Route("/error")]
+  [ApiExplorerSettings(IgnoreApi = true)]
+  public IActionResult HandleError() => Problem();
+
+
+  private IActionResult FilterException(Exception exception)
+  {
+    HttpStatusCode code;
+    switch (exception)
+    {
+      case KeyNotFoundException
+            or FileNotFoundException:
+        code = HttpStatusCode.NotFound;
+        break;
+      case UnauthorizedAccessException:
+        code = HttpStatusCode.Unauthorized;
+        break;
+      default:
+        code = HttpStatusCode.InternalServerError;
+        break;
+    }
+    return Problem(
+        detail: exception.StackTrace,
+        title: exception.Message,
+        statusCode: (int?)code
+        );
+  }
+
+}
