@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Identity;
+using SendGrid.Helpers.Errors.Model;
 
 namespace identity.user;
 
@@ -150,4 +151,20 @@ public class UserService
     }
   }
 
+  public async Task ForgotPassword(string email)
+  {
+    var user = await SignInManager.UserManager.FindByEmailAsync(email);
+
+    if (user == null)
+    {
+      throw new KeyNotFoundException("Erro ao validar email!");
+    }
+
+    Random rnd = new();
+    string newPassword = $"A@{rnd.Next(100000, 999999)}b";
+    var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+    await UserManager.ResetPasswordAsync(user, token, newPassword);
+    await EmailSender.SendEmailAsync(email, "Prontu - Email com nova senha", $"Esta é sua nova senha {newPassword}, você pode modificá-la assim que fizer o login!");
+
+  }
 }

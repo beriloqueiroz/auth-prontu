@@ -114,6 +114,13 @@ public class UserController : ControllerBase
     return Ok();
   }
 
+  [HttpPut("forgot-password")]
+  public async Task<IActionResult> ForgotPassword(string email)
+  {
+    await UserService.ForgotPassword(email);
+    return Ok();
+  }
+
   [Route("/error-development")]
   [ApiExplorerSettings(IgnoreApi = true)]
   public IActionResult HandleErrorDevelopment([FromServices] IHostEnvironment hostEnvironment)
