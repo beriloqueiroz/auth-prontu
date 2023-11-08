@@ -37,6 +37,10 @@ public class EmailSender : IEmailSender
 
     msg.SetClickTracking(false, false);
     var response = await client.SendEmailAsync(msg);
+    if (!response.IsSuccessStatusCode)
+    {
+      throw new Exception("Erro ao enviar e-mail!");
+    }
     _logger.LogInformation(response.IsSuccessStatusCode ? $"Email to {toEmail} queued successfully!" : $"Failure Email to {toEmail}");
   }
 }

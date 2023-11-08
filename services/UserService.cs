@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Identity;
-using SendGrid.Helpers.Errors.Model;
 
 namespace identity.user;
 
@@ -165,6 +164,5 @@ public class UserService
     var token = await UserManager.GeneratePasswordResetTokenAsync(user);
     await UserManager.ResetPasswordAsync(user, token, newPassword);
     await EmailSender.SendEmailAsync(email, "Prontu - Email com nova senha", $"Esta é sua nova senha {newPassword}, você pode modificá-la assim que fizer o login!");
-
   }
 }
