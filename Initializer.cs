@@ -14,7 +14,12 @@ public static class Initializer
   {
     services.AddDbContext<UserDbContext>(options => options.UseNpgsql(Configuration["ConnectionStrings:UserConnection"]));
 
-    services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    services.AddIdentity<User, IdentityRole>(options =>
+    {
+      options.SignIn.RequireConfirmedAccount = true;
+      options.Lockout.MaxFailedAccessAttempts = 3;
+      options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    })
     .AddEntityFrameworkStores<UserDbContext>()
     .AddDefaultTokenProviders();
 

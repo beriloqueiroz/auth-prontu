@@ -56,7 +56,7 @@ public class UserService
 
   public async Task<string> Login(string username, string password)
   {
-    var userResult = await SignInManager.PasswordSignInAsync(username, password, false, false);
+    var userResult = await SignInManager.PasswordSignInAsync(username, password, false, true);
 
     if (!userResult.Succeeded)
     {
@@ -82,7 +82,7 @@ public class UserService
       throw new UnauthorizedAccessException("Erro ao validar/autenticar!");
     }
 
-    var userResult = await SignInManager.PasswordSignInAsync(user, password, false, false);
+    var userResult = await SignInManager.PasswordSignInAsync(user, password, false, true);
 
     if (!userResult.Succeeded)
     {
