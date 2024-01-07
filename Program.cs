@@ -12,7 +12,6 @@ builder.Services.InjectMySwagger();
 var app = builder.Build();
 
 Console.WriteLine("Setting environment variables for each target..., how production\n ");
-Environment.SetEnvironmentVariable("UrlBase", "https://localhost:5000");
 
 if (app.Environment.IsDevelopment())
 {
