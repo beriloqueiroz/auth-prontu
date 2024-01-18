@@ -27,7 +27,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMyDocumentation();
     Console.WriteLine("Setting environment variables for each target..., how development\n ");
-    Environment.SetEnvironmentVariable("UrlBase", "http://localhost:5000");
+    Environment.SetEnvironmentVariable("UrlBase", "http://localhost:3000");
 }
 
 app.UseHttpsRedirection();
